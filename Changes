@@ -93,3 +93,6 @@ Revision history for Graph::Weighted
     - Added the forgotten "fullest" and "emptiest" methods to
       Capacity.pm.
     - Enhanced the API Methods documentation section in Weighted.pm.
+
+0.1301  Sun Sep 27 2003
+    - Made $VERSION a real number and put it on it's own line.

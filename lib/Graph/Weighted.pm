@@ -1,7 +1,12 @@
+# $Id: Weighted.pm,v 1.2 2003/09/28 08:01:03 gene Exp $
+
 package Graph::Weighted;
+
+use vars qw($VERSION);
+$VERSION = '0.1301';
+
 use strict;
 use Carp;
-use vars qw($VERSION); $VERSION = '0.13';
 use base qw(Graph::Directed);
 
 use constant WEIGHT => 'weight';

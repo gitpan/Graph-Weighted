@@ -1,7 +1,12 @@
+# $Id: Capacity.pm,v 1.2 2003/09/28 08:06:50 gene Exp $
+
 package Graph::Weighted::Capacity;
+
+use vars qw($VERSION);
+$VERSION = '0.0301';
+
 use strict;
 use Carp;
-use vars qw($VERSION); $VERSION = '0.03';
 use base qw(Graph::Weighted);
 
 use constant CAPACITY => 'capacity';
@@ -17,9 +22,9 @@ sub new {
     return $self;
 }
 
-sub load_capacity  { shift->load(@_, CAPACITY) }
+sub load_capacity { shift->load(@_, CAPACITY) }
 
-sub capacity_data  { shift->data(@_, CAPACITY) }
+sub capacity_data { shift->data(@_, CAPACITY) }
 
 sub graph_capacity { shift->graph_attr(@_, CAPACITY) }
 
@@ -27,9 +32,9 @@ sub fullest_vertices { shift->fullest_vertices(CAPACITY) }
 
 sub emptiest_vertices { shift->emptiest_vertices(CAPACITY) }
 
-sub max_capacity   { shift->max_attr(CAPACITY) }
+sub max_capacity { shift->max_attr(CAPACITY) }
 
-sub min_capacity   { shift->min_attr(CAPACITY) }
+sub min_capacity { shift->min_attr(CAPACITY) }
 
 sub vertex_capacity {
     my $self = shift;
