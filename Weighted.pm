@@ -1,7 +1,7 @@
 package Graph::Weighted;
 use strict;
 use Carp;
-use vars qw($VERSION); $VERSION = '0.07';
+use vars qw($VERSION); $VERSION = '0.08';
 use base qw(Graph::Directed);
 
 use constant WEIGHT => 'weight';
@@ -338,8 +338,8 @@ Graph::Weighted - A weighted graph implementation
   $heavies = $g->heaviest_vertices;
   $lights  = $g->lightest_vertices;
 
-  $x = $g->max_weight;  # Equal to the $heavies.
-  $y = $g->min_weight;  # Equal to the $lights.
+  $x = $g->max_weight;  # Equal to the weight of the $heavies.
+  $y = $g->min_weight;  # Equal to the weight of the $lights.
 
   # Call any methods of the inherited Graph module.
   @v = $g->vertices;
@@ -412,37 +412,31 @@ Get the total weight of the graph, by summing all the vertex weights.
 
 =item vertex_weight $VERTEX [, $WEIGHT]
 
-Return the weight of a vertex.  This method can also be used to set 
-the vertex weight, if a second argument is provided.
+Return the weight of a vertex.
 
 (The vertices are just the keys of the data, not some glorified 
-object.)
+object, by the way.)
 
-When the second argument is provided, the weight it represents is 
-distributed evenly to the vertex's outgoing edges, and the total 
-weight of the entire graph is adjusted accordingly.
+If a second argument is provided, the vertex weight is set to that 
+value and is distributed evenly to the vertex's outgoing edges, and 
+the total weight of the graph is adjusted accordingly.
 
-=item edge_weight $VERTEX, $NEIGHBOR [, $WEIGHT]
+=item edge_weight $VERTEX, $SUCCESSOR [, $WEIGHT]
 
-Return the weight of an edge between the two given vertices.  This 
-method can also be used to set the edge weight, if a third argument 
-is provided.
+Return the weight of an edge between the two given vertices.
 
-(The vertices are just the keys of the data, not some glorified 
-object.)
-
-When the third argument is provided, the weight it represents is used
+If a third argument is provided, the weight it represents is used
 to replace the weight of the edge between the vertex (first argument)
-and it's successor (second argument).  Lastly, the total weight of the 
-entire graph and the weight of the vertex are adjusted accordingly.
+and it's successor (second argument).  Finally, the weight of the 
+vertex and the total weight of the graph are adjusted accordingly.
 
 =item heaviest_vertices
 
-Return the array reference of vertices with the most weight.
+Return an array reference of vertices with the most weight.
 
 =item lightest_vertices
 
-Return the array reference of vertices with the least weight.
+Return an array reference of vertices with the least weight.
 
 =item max_weight
 
@@ -466,19 +460,15 @@ Print the contents of the argument array with a newline appended.
 
 =head1 SEE ALSO
 
-C<Graph::Base>
+L<Graph::Base>
 
 =head1 TO DO
 
 Handle clusters of vertices and sub-graphs.
 
-Handle "capacity graphs" as detailed in the C<Graph::Base> module?
-
-Handle Math::MatrixSparse and PDL::Matrix objects?
-
 =head1 AUTHOR
 
-Gene Boggs E<lt>gene@cpan@.orgE<gt>
+Gene Boggs E<lt>gene@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 

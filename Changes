@@ -52,3 +52,6 @@ Revision history for Graph::Weighted
     - Added tests for empty data references.
     - Added croaks for undefined vertices in the vertex_ and 
       edge_weight methods.
+
+0.08  Fri Jul 11 2003
+    - Enhanced the documentation.
