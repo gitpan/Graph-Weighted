@@ -87,8 +87,10 @@ ok $y == $x + 1, 'vertex_weight adjusted up';
 is_deeply $g->matrix->{a},
     { a => 1.33333333333333, b => 1.33333333333333, c => 1.33333333333333, },
     'distributed outgoing weight up';
+is $g->edge_weight('a', 'a'), 1.33333333333333, 'a->a edge_weight adjusted up';
+is $g->edge_weight('a', 'b'), 1.33333333333333, 'a->b edge_weight adjusted up';
+is $g->edge_weight('a', 'c'), 1.33333333333333, 'a->c edge_weight adjusted up';
 is $g->graph_weight, $w + 1, 'graph_weight adjusted up';
-# XXX check the edge weights too
 
 $w = $g->graph_weight;
 $x = $g->vertex_weight('a');
@@ -96,8 +98,10 @@ $y = $g->vertex_weight('a', $x - 1);
 ok $y == $x - 1, 'vertex_weight adjusted down';
 is_deeply $g->matrix->{a}, { a => 1, b => 1, c => 1, },
     'distributed outgoing weight down';
+is $g->edge_weight('a', 'a'), 1, 'a->a edge_weight adjusted down';
+is $g->edge_weight('a', 'b'), 1, 'a->b edge_weight adjusted down';
+is $g->edge_weight('a', 'c'), 1, 'a->c edge_weight adjusted down';
 is $g->graph_weight, $w - 1, 'graph_weight adjusted down';
-# XXX check the edge weights too
 
 $w = $g->graph_weight;
 my $v = $g->vertex_weight('a');

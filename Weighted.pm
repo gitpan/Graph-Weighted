@@ -1,7 +1,7 @@
 package Graph::Weighted;
 use strict;
 use Carp;
-use vars qw($VERSION); $VERSION = '0.01';
+use vars qw($VERSION); $VERSION = '0.01.1';
 use base qw(Graph);
 
 use constant WEIGHT => 'weight';
@@ -258,13 +258,19 @@ Graph::Weighted - A weighted graph implementation
 
   $g = Graph::Weighted->new(
       data => {
-          a => { b => 1, c => 2, },  # Nodes with two edges.
+          a => { b => 1, c => 2, },  # Vertices with two edges.
           b => { a => 1, c => 3, },
           c => { a => 2, b => 3, },
           d => { c => 1, },          # A vertex with one edge.
           e => {},                   # A vertex with no edges.
      }
   );
+
+  $x = $g->vertex_weight('a');
+  $y = $g->vertex_weight('a', $x + 1);
+
+  $x = $g->edge_weight('a', 'b');
+  $y = $g->edge_weight('a', 'b', $x + 1);
 
   $g->reset_graph;
 
@@ -273,21 +279,20 @@ Graph::Weighted - A weighted graph implementation
   $g->load(
       [ [ 0, 1, 2 ],
         [ 1, 0, 3 ],
-        [ 2, 3, 0 ], ]
+        [ 2, 3, 0 ],
+        [ 0, 0, 1 ],
+        [ 0, 0, 0 ], ]
   );
 
   $w = $g->graph_weight;
 
+  $m = $g->matrix;
+
   $heaviest = $g->heaviest_vertices;
   $lightest = $g->lightest_vertices;
 
-  $x = $g->vertex_weight($heaviest->[$i]) if @$heaviest;
-  $y = $g->vertex_weight($lightest->[$j]) if @$lightest;
-
-  $x = $g->vertex_weight(0);
-  $y = $g->vertex_weight(0, $x + 1);
-
-  $m = $g->matrix;
+  $x = $g->vertex_weight($heaviest->[$i]);
+  $y = $g->vertex_weight($lightest->[$j]);
 
 =head1 ABSTRACT
 
@@ -386,11 +391,19 @@ Print the contents of the argument array with a newline appended.
 
 =head1 SEE ALSO
 
-L<Graph>
+C<Graph>
 
 =head1 TO DO
 
+Argh!  Find and purge the totally annoying, strong coupling side 
+effect in the C<graph_weight> method.
+
+Add attribute aware C<Graph> method tests to the test suite and 
+SYNOPSIS section.
+
 Handle clusters of vertices and sub-graphs.
+
+Handle C<Math::MatrixReal> objects.
 
 =head1 AUTHOR
 
