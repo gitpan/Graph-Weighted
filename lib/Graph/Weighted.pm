@@ -1,7 +1,7 @@
 package Graph::Weighted;
 use strict;
 use Carp;
-use vars qw($VERSION); $VERSION = '0.11';
+use vars qw($VERSION); $VERSION = '0.12';
 use base qw(Graph::Directed);
 
 use constant WEIGHT => 'weight';

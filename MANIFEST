@@ -2,8 +2,8 @@ Changes
 MANIFEST
 Makefile.PL
 README
-lib/Weighted.pm
-lib/Weighted/Capacity.pm
+lib/Graph/Weighted.pm
+lib/Graph/Weighted/Capacity.pm
 t/capacity.t
 t/default.t
 t/weighted.t
