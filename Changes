@@ -58,3 +58,11 @@ Revision history for Graph::Weighted
 
 0.08.1  Fri Jul 11 2003
     - Excised the unnecessary =head1 ABSTRACT section.
+
+0.09  Tue Jul 14 2003
+    - Fixed my malformed matrix skip tests.  Thank you Randy Kobes!
+    - Fixed my
+        eval { $g = G::W->new(...) }; ok !$@, 'blah blah';
+      tests to be,
+        $g = eval { G::W->new(...) }; isa_ok $g, GW, 'blah blah'
+      Thank you Andy Lester!

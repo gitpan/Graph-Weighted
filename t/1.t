@@ -1,5 +1,7 @@
-use Test::More tests => 57;
+use Test::More tests => 56;
 BEGIN { use_ok 'Graph::Weighted' };
+
+use constant GW => 'Graph::Weighted';
 
 my $matrix = [
     [ 0, 1, 2, 0, 0, ],
@@ -16,32 +18,29 @@ my $data = {
     4 => {},
 };
 
-my $g;
-
 # basic creation
-eval {
-    $g = Graph::Weighted->new(
+my $g = eval {
+    Graph::Weighted->new(
 #        debug => 1,
     );
 };
-isa_ok $g, 'Graph::Weighted';
-ok !$@, 'created a G::W object with no arguments';
+isa_ok $g, GW, 'with no arguments';
 
 # creation with empty data references.
-eval {
-    $g = Graph::Weighted->new(
+$g = eval {
+    Graph::Weighted->new(
     #    debug => 1,
         data => [],
     );
 };
-eval {
-ok !$@, 'creation with empty data LoL';
-    $g = Graph::Weighted->new(
+isa_ok $g, GW, 'with empty arrayref data';
+$g = eval {
+    Graph::Weighted->new(
     #    debug => 1,
         data => {},
     );
 };
-ok !$@, 'creation with empty data HoH';
+isa_ok $g, GW, 'with empty hashref data';
 
 # loading and LoL -> HoH
 $g = Graph::Weighted->new(
@@ -71,38 +70,40 @@ is $g->edge_weight(4, $_), 0, "4 =(0)=> $_: edge weight defined"
 # Matrix objects
 SKIP: {
     $data = [ [1, 2], [3, 4] ];
-
     eval { require Math::Matrix };
     skip "Math::Matrix not installed", 1 if $@;
-    eval {
-        $g = Graph::Weighted->new(
+    $g = eval {
+        Graph::Weighted->new(
 #            debug => 1,
             data => Math::Matrix->new($data),
         );
     };
-    ok !$@, 'creation from Math::Matrix object';
-
+    isa_ok $g, GW, 'Math::Matrix object data';
+}
+SKIP: {
+    $data = [ [1, 2], [3, 4] ];
     eval { require Math::MatrixReal };
     skip "Math::MatrixReal not installed", 1 if $@;
-    eval {
-        $g = Graph::Weighted->new(
+    $g = eval {
+        Graph::Weighted->new(
 #            debug => 1,
             data => Math::MatrixReal->new_from_rows($data),
         );
     };
-    ok !$@, 'creation from Math::MatrixReal object';
-
+    isa_ok $g, GW, 'Math::MatrixReal object data';
+}
+SKIP: {
     eval { require Math::MatrixBool };
     skip "Math::MatrixBool not installed", 1 if $@;
-    eval {
-        $g = Graph::Weighted->new(
+    $g = eval {
+        Graph::Weighted->new(
 #            debug => 1,
             data => Math::MatrixBool->new_from_string(
                 "[ 1 0 0 ]\n[ 1 1 0 ]\n[ 1 1 1 ]\n"
             ),
         );
     };
-    ok !$@, 'creation from Math::MatrixBool object';
+    isa_ok $g, GW, 'Math::MatrixBool object data';
 }
 
 # non-square
@@ -116,8 +117,8 @@ eval {
 ok $@, 'non-square LoL load failed properly';
 
 # create with HoH
-eval {
-    $g = Graph::Weighted->new(
+$g = eval {
+    Graph::Weighted->new(
 #        debug => 1,
         zero_edges => 1,
         data => {
@@ -129,7 +130,7 @@ eval {
         },
     );
 };
-ok !$@, 'zero_edges object creation with HoH';
+isa_ok $g, GW, 'zero_edges HoH';
 
 # Edges? We don' need no steenking edges!
 my @e = $g->edges();
