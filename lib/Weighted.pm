@@ -1,7 +1,7 @@
 package Graph::Weighted;
 use strict;
 use Carp;
-use vars qw($VERSION); $VERSION = '0.10';
+use vars qw($VERSION); $VERSION = '0.11';
 use base qw(Graph::Directed);
 
 use constant WEIGHT => 'weight';
@@ -18,9 +18,14 @@ sub new {  # {{{
         debug => $args{debug} || 0,
         zero_edges => $args{zero_edges} || 0,
         attr => $args{default_attribute} || WEIGHT,
+        retrieve_as => $args{retrieve_as} || 'HASH',
     };
 
     bless $self, $class;
+
+    # We need to show the zero edges if we want to retrieve data as
+    # an LoL.
+    $self->{zero_edges} = 1 if $self->{retrieve_as} eq 'ARRAY';
 
     $self->_init($args{data}) if $args{data};
 
@@ -178,12 +183,23 @@ sub data {  # {{{
     $attr ||= $self->{attr};
 $self->_debug("entering data for $attr");
 
-    # Build a HoH from the vertices and edge values.
-    my %data;
+    # The hash or array reference to return.
+    my $data;
+
+    # Initialize the i,j counters for array format.
+    my ($i, $j) = (0, 0);
+
+    # Build a hash or array ref from the vertices and edge values.
     for my $v ($self->vertices) {
-        # Set the vertex representation.
-        $data{$v} = {};
-$self->_debug("vertex $v:");
+$self->_debug("$i th vertex $v:");
+
+        # Set the vertex.
+        if ($self->{retrieve_as} eq 'ARRAY') {
+            $data->[$i] = [];
+        }
+        elsif ($self->{retrieve_as} eq 'HASH') {
+            $data->{$v} = {};
+        }
 
         # Add the edge values.
         for ($self->successors($v)) {
@@ -192,12 +208,25 @@ $self->_debug("vertex $v:");
                 successor => $_,
                 attr => $attr,
             );
-$self->_debug("successor $_ has $attr of $n");
-            $data{$v}{$_} = $n;
+
+$self->_debug("$j th successor $_ has $attr of $n");
+
+            if ($self->{retrieve_as} eq 'ARRAY') {
+#                $data->[$i][$j] = $n;
+                push @{ $data->[$i] }, $n;
+            }
+            elsif ($self->{retrieve_as} eq 'HASH') {
+                $data->{$v}{$_} = $n;
+            }
+
+            $j++;
         }
+
+        $i++;
     }
+
 $self->_debug("exiting data");
-    return \%data;
+    return $data;
 }  # }}}
 
 sub graph_weight { shift->graph_attr(@_, WEIGHT) }
@@ -248,7 +277,7 @@ sub vertex_attr {  # {{{
         croak 'No attribute provided.';
     my $value = $args{value};
 
-$self->_debug("entering vertex_attr for $attr with $vertex");
+$self->_debug("entering vertex_attr for $attr with vertex $vertex");
 
     if (defined $value) {
         # Distribute the value to all outgoing edges.
@@ -314,7 +343,7 @@ sub edge_attr {  # {{{
         croak 'No attribute provided.';
     my $value = $args{value};
 
-$self->_debug("entering edge_attr for $attr with $vertex and $successor");
+$self->_debug("entering edge_attr for $attr with vertex $vertex and successor $successor");
 
     if (defined $value) {
 $self->_debug("$attr is defined as $value");
@@ -455,26 +484,36 @@ Graph::Weighted - An abstract, weighted graph implementation
   use Graph::Weighted;
 
   $g = Graph::Weighted->new(
-      [ [ 0, 1, 2, 0, 0 ],   # A vertex with two edges.
-        [ 1, 0, 3, 0, 0 ],   # "
-        [ 2, 3, 0, 0, 0 ],   # "
-        [ 0, 0, 1, 0, 0 ],   # A vertex with one edge.
-        [ 0, 0, 0, 0, 0 ] ]  # A vertex with no edges.
+      data => [
+        [ 0, 1, 2, 0, 0 ],  # A vertex with two edges.
+        [ 1, 0, 3, 0, 0 ],  # "
+        [ 2, 3, 0, 0, 0 ],  # "
+        [ 0, 0, 1, 0, 0 ],  # A vertex with one edge.
+        [ 0, 0, 0, 0, 0 ]   # A vertex with no edges.
+      ]
   );
 
   $g = Graph::Weighted->new(
       data => {
-        weight => {
-            a => { b => 1, c => 2 },  # A vertex with two edges.
-            b => { a => 1, c => 3 },  # "
-            c => { a => 2, b => 3 },  # "
-            d => { c => 1 },          # A vertex with one edge.
-            e => {}                   # A vertex with no edges.
-        }
+          weight => {
+              a => { b => 1, c => 2 },  # A vertex with two edges.
+              b => { a => 1, c => 3 },  # "
+              c => { a => 2, b => 3 },  # "
+              d => { c => 1 },          # A vertex with one edge.
+              e => {}                   # A vertex with no edges.
+          }
+          foo => [
+              [ 1, 2, 3 ],
+              [ 4, 5, 6 ],
+              [ 7, 8, 9 ]
+          ],
      }
   );
 
-  $g = Graph::Weighted->new(data => $Math_Matrix_object);
+  $g = Graph::Weighted->new(
+      data => $Math_Matrix_object,
+      retrieve_as => 'ARRAY',
+  );
 
   $data = $g->weight_data;
 
@@ -489,8 +528,8 @@ Graph::Weighted - An abstract, weighted graph implementation
   $vertices = $g->heaviest_vertices;
   $vertices = $g->lightest_vertices;
 
-  $w = $g->max_weight;  # Weight of the $heavies vertices.
-  $w = $g->min_weight;  # Weight of the $lights vertices.
+  $w = $g->max_weight;  # Weight of the largest vertices.
+  $w = $g->min_weight;  # Weight of the smallest vertices.
 
   # Call the weight methods of the inherited Graph module.
   $x = $g->MST_Kruskal;
@@ -501,10 +540,10 @@ Graph::Weighted - An abstract, weighted graph implementation
 
 A C<Graph::Weighted> object represents a subclass of 
 C<Graph::Directed> with weighted attributes that are taken from a two 
-dimensional matrix (as an array or hash reference) of numerical 
-values.
+dimensional matrix of numerical values.
 
-This module can also load the matrix portions of C<Math::Matrix>, 
+This module can use a standard array or hash reference for data.  It 
+can also load the matrix portions of C<Math::Matrix>, 
 C<Math::MatrixReal>, and C<Math::MatrixBool> objects.
 
 Initially, the weights of the vertices are set to the sum of their 
@@ -553,21 +592,31 @@ for vertices and weighted edges.
 C<Math::Matrix>, C<Math::MatrixReal>, and C<Math::MatrixBool> objects 
 can also be loaded.
 
+=item retrieve_as => 'HASH' | 'ARRAY'
+
+Flag to tell the C<weight_data> method to output as a hash or array
+reference.  Defaults to C<HASH>.
+
+If this object attribute is set to C<ARRAY>, the C<zero_edges> 
+attribute is automatically turned on.
+
 =back
 
 =item * load_weights $HASHREF | $ARRAYREF | $OBJECT
 
-Turn the given two dimensional hash, (NxN) array, or known object 
-reference into the vertices and weighted edges of a 
-C<Graph::Directed> object.
+Turn the given two dimensional hash, (NxN) array, or object reference 
+into the vertices and weighted edges of a C<Graph::Directed> object.
 
 C<Math::Matrix>, C<Math::MatrixReal>, and C<Math::MatrixBool> objects 
 can also be loaded.
 
 =item * weight_data
 
-Return a two dimensional hash representing the vertices and all their 
+Return a two dimensional representation of the vertices and all their 
 weighted edges.
+
+The representation can be either a hash or array reference, depending
+on the C<retrieve_as> object attribute setting.
 
 =item * graph_weight
 
@@ -624,10 +673,22 @@ Print the contents of the argument array with a newline appended.
 
 =head1 API METHODS
 
-These are generic methods that are used for the public methods of
+This section briefly describes the methods to use when creating your
+own, custom subclass of C<Graph::Weighted>.  Please see the
+C<Graph::Weighted::Capacity> module for a simple example.
+
+These are generic methods used in the public methods of
 C<Graph::Weighted> and C<Graph::Weighted::Capacity>.  Primarily, they
 each accept an extra attribute argument and use the class default 
 attribute, if none is provided.
+
+Please remember that the C<default_attribute> should probably be set,
+even though it is not required.  Also, it is recommended that you
+specifically call your methods with an attribute (shown as C<[$ATTR]> 
+below), even though you may have already defined a default.  This is 
+to avoid the mixups that result in "multi-attributed" graphs, where 
+the default may be something other than the data attribute of
+interest.
 
 All the following methods are described in greater detail under the 
 C<PUBLIC METHODS> section, above.
@@ -668,7 +729,13 @@ references.
 
 =item * data [$ATTR]
 
-  $hash_ref = $g->data($attr);
+  $data = $g->data($attr);
+
+Return a two dimensional representation of the vertices and all their 
+valued edges.
+
+The representation can be either a hash or array reference, depending
+on the C<retrieve_as> object attribute setting.
 
 =item * graph_attr [$ATTR]
 
@@ -721,13 +788,13 @@ L<Graph::Weighted::Capacity>
 
 =head1 TO DO
 
-Make the C<data> method emit an array reference as well as a hash
-reference.
-
 Handle arbitrary string attribute values.
 
 Handle algebraic expression attribute values (probably via 
 C<Math::Symbolic>).  Lisp expressions come to mind also...
+
+That is, use some sort of callback to update values, instead of
+addition and subtraction.
 
 =head1 AUTHOR
 

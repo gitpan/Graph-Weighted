@@ -67,7 +67,7 @@ Revision history for Graph::Weighted
         $g = eval { G::W->new(...) }; isa_ok $g, GW, 'blah blah'
       Thank you Andy Lester!
 
-0.10  Wed 30 2003
+0.10  Wed Jul 30 2003
     - Wow.  Where should I begin...
     - Basically, I refactored every single method to accept an
       attribute argument or use a class default.
@@ -76,3 +76,9 @@ Revision history for Graph::Weighted
       generic API.
     - Made tests for the default behavior and Capacity.pm, as nearly
       identical copies of the original (for Weighted.pm).
+
+0.11  Thu Jul 31 2003
+    - Whoopsy.  Left unnecessary tests in capacity.t.
+    - Added the "retrieve_as" attribute to the class so that the data
+      can be pulled out as either a hash or array reference.
+    - Enhanced documentation all over, in Weighted.pm and Capacity.pm.

@@ -1,4 +1,4 @@
-use Test::More tests => 56;
+use Test::More tests => 57;
 BEGIN { use_ok 'Graph::Weighted' };
 
 use constant GW => 'Graph::Weighted';
@@ -50,6 +50,16 @@ eval { $g->load_weight($matrix) };
 ok !$@, 'LoL load_weight';
 is_deeply $g->weight_data, $data, 'HoH constructed from LoL';
 
+# return LoL data
+$g = Graph::Weighted->new(
+#    debug => 1,
+    retrieve_as => 'ARRAY',
+    data => $matrix,
+);
+#print join ("\n", map { "[@$_]" } @$matrix), "\n";
+#print join ("\n", map { "[@$_]" } @{ $g->weight_data }), "\n";
+is_deeply $g->weight_data, $matrix, 'data retrieved as LoL';
+
 # zero_edges
 $g = Graph::Weighted->new(
 #    debug => 1,
@@ -71,7 +81,7 @@ is $g->edge_weight(4, $_), 0, "4 =(0)=> $_: edge weight defined"
 SKIP: {
     $data = [ [1, 2], [3, 4] ];
     eval { require Math::Matrix };
-    skip "Math::Matrix not installed", 1 if $@;
+    skip 'Math::Matrix not installed', 1 if $@;
     $g = eval {
         Graph::Weighted->new(
 #            debug => 1,
@@ -83,7 +93,7 @@ SKIP: {
 SKIP: {
     $data = [ [1, 2], [3, 4] ];
     eval { require Math::MatrixReal };
-    skip "Math::MatrixReal not installed", 1 if $@;
+    skip 'Math::MatrixReal not installed', 1 if $@;
     $g = eval {
         Graph::Weighted->new(
 #            debug => 1,
@@ -94,7 +104,7 @@ SKIP: {
 }
 SKIP: {
     eval { require Math::MatrixBool };
-    skip "Math::MatrixBool not installed", 1 if $@;
+    skip 'Math::MatrixBool not installed', 1 if $@;
     $g = eval {
         Graph::Weighted->new(
 #            debug => 1,

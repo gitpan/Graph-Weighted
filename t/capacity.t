@@ -1,4 +1,4 @@
-use Test::More tests => 56;
+use Test::More tests => 53;
 
 BEGIN { use_ok 'Graph::Weighted::Capacity' };
 
@@ -200,12 +200,3 @@ ok $y == $x - 1, 'edge capacity adjusted down';
 is $g->capacity_data->{$p}{$q}, 1, 'outgoing edge capacity adjusted down';
 is $g->vertex_capacity($p), $v - 1, 'vertex capacity adjusted down';
 is $g->graph_capacity, $w - 1, 'graph capacity adjusted down';
-
-# Make sure we can call appropriate Graph methods.
-my $z;
-eval { $z = $g->MST_Kruskal };
-ok !$@, 'MST_Kruskal worked';
-eval { $z = $g->APSP_Floyd_Warshall };
-ok !$@, 'APSP_Floyd_Warshall worked';
-eval { $z = $g->MST_Prim('a') };
-ok !$@, 'MST_Prim worked';

@@ -1,7 +1,7 @@
 package Graph::Weighted::Capacity;
 use strict;
 use Carp;
-use vars qw($VERSION); $VERSION = '0.01';
+use vars qw($VERSION); $VERSION = '0.02';
 use base qw(Graph::Weighted);
 
 use constant CAPACITY => 'capacity';
@@ -78,17 +78,16 @@ Graph::Weighted::Capacity - A capacity graph implementation
               e => {}                   # A vertex with no edges.
           },
           weight => [
-              [ 1, 2, 3, 4, 5 ],
-              [ 6, 7, 8, 9, 0 ],
-              [ 1, 2, 3, 4, 5 ],
-              [ 6, 7, 8, 9, 0 ],
-              [ 0, 1, 0, 1, 0 ]
-          ],
+              [ 1, 2, 3 ],
+              [ 4, 5, 6 ],
+              [ 7, 8, 9 ]
+          ]
       }
   );
 
   $g = Graph::Weighted::Capacity->new(
-      data => $Math_Matrix_object
+      data => $Math_Matrix_object,
+      retrieve_as => 'ARRAY',
   );
 
   $data = $g->capacity_data;
@@ -117,13 +116,18 @@ A C<Graph::Weighted::Capacity> object represents a subclass of
 C<Graph::Weighted> with capacity attributes that are taken from a two 
 dimensional matrix of numerical values.
 
-This module can also load the matrix portions of C<Math::Matrix>, 
+This module can use a standard array or hash reference for data.  It 
+can also load the matrix portions of C<Math::Matrix>, 
 C<Math::MatrixReal>, and C<Math::MatrixBool> objects.
 
 Initially, the capacities of the vertices are set to the sum of their 
 outgoing edge capacities.  This is mutable, however, and can be reset 
 to any value desired, after initialization, with the 
 C<vertex_capacity> and C<edge_capacity> methods.
+
+This module is an extension of a more generic module that can handle
+multiple attributes - not just C<capacity> and C<weight>.  Please see
+the C<Graph::Weighted> documentation.
 
 =head1 PUBLIC METHODS
 
@@ -142,6 +146,15 @@ Flag to invoke verbose mode while processing.  Defaults to zero.
 Flag to add edges between vertices with a capacity of zero.  Defaults 
 to zero.
 
+=item default_attribute => STRING
+
+The attribute to use by default, if the generic (C<load>, C<data>, 
+and C<*_attr>) methods are called without an attribute as an 
+argument (which should never actually happen, if you are doing thing 
+corrdctly).
+
+This is set to 'weight', by default, of course.
+
 =item data => $HASHREF | $ARRAYREF | $OBJECT
 
 Two dimensional hash (HoH), (NxN) array, or object reference to use 
@@ -149,6 +162,14 @@ for vertex and edge capacities.
 
 C<Math::Matrix>, C<Math::MatrixReal>, and C<Math::MatrixBool> objects 
 can also be loaded.
+
+=item retrieve_as => 'HASH' | 'ARRAY'
+
+Flag to tell the C<weight_data> method to output as a hash or array
+reference.  Defaults to C<HASH>.
+
+If this object attribute is set to C<ARRAY>, the C<zero_edges> 
+attribute is automatically turned on.
 
 =back
 
@@ -162,7 +183,11 @@ can also be loaded.
 
 =item * capacity_data
 
-Return a two dimensional hash of vertices and thier edge capacities.
+Return a two dimensional representation of the vertices and all their 
+weighted edges.
+
+The representation can be either a hash or array reference, depending
+on the C<retrieve_as> object attribute setting.
 
 =item * graph_capacity
 
