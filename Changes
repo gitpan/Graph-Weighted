@@ -17,3 +17,11 @@ Revision history for Graph::Weighted.
     - Fixed the text of this file.
     - Added better test conditions for the "zero_edges" flag setting.
     - Handled Math::MatrixReal objects in the load method.
+
+0.03  Sun Jun 29
+    - Fixed the README.
+    - Fixed and enhanced the documentation.
+    - Refactored the test script, big time.
+    - Added a conditional test for Math::MatrixReal.
+    - Renamed the "matrix" accessor to "data", since a HoH is not
+      really a matrix.

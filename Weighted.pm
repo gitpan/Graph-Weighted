@@ -1,7 +1,7 @@
 package Graph::Weighted;
 use strict;
 use Carp;
-use vars qw($VERSION); $VERSION = '0.02';
+use vars qw($VERSION); $VERSION = '0.03';
 use base qw(Graph::Directed);
 
 use constant WEIGHT => 'weight';
@@ -34,13 +34,13 @@ sub load {  # {{{
     my ($self, $data) = @_;
 $self->_debug("entering load with $data");
 
-    $data = $data->[0] if ref ($data) eq 'Math::MatrixReal';
+    if (ref ($data) eq 'Math::MatrixReal') {
+$self->_debug('data is a Math::MatrixReal object');
+        $data = $data->[0];
+    }
 
     # We are given a HoH.
     if (ref ($data) eq 'HASH') {
-        # Set the object matrix to the HoH data.
-        $self->{matrix} = $data;
-
         # Set the vertices and weighted edges.
         while (my ($vertex, $neighbors) = each %$data) {
             # Add an "edgeless vertex" if there are no neighbors or
@@ -63,6 +63,9 @@ $self->_debug("$vertex =($n)=> $neighbor");
     }
     # We are given a LoL.
     elsif (ref ($data) eq 'ARRAY') {
+        # Initialize the object data.
+        $self->{data} = {};
+
         # Set the vertices and weighted edges.
         for my $vertex (0 .. @$data - 1) {
             croak "Incorrectly sized array\n"
@@ -75,7 +78,7 @@ $self->_debug("$vertex weight = $weight");
             unless ($weight || $self->{zero_edges}) {
 $self->_debug("$vertex edgeless");
                 $self->add_vertex($vertex);
-                $self->{matrix}{$vertex} = {};
+                $self->{data}{$vertex} = {};
             }
 
             for my $neighbor (0 .. @{ $data->[$vertex] } - 1) {
@@ -85,7 +88,7 @@ $self->_debug("$vertex edgeless");
 $self->_debug("$vertex =($n)=> $neighbor");
                     $self->add_weighted_edge($vertex, $n, $neighbor);
 
-                    $self->{matrix}{$vertex}{$neighbor} = $n;
+                    $self->{data}{$vertex}{$neighbor} = $n;
                 }
             }
         }
@@ -96,8 +99,8 @@ $self->_debug("$vertex =($n)=> $neighbor");
 $self->_debug('exiting load');
 }  # }}}
 
-sub matrix {  # {{{
-    return shift->{matrix};
+sub data {  # {{{
+    return shift->{data};
 }  # }}}
 
 sub graph_weight {  # {{{
@@ -132,13 +135,13 @@ $self->_debug("weight is defined as $weight");
         $self->set_attribute(WEIGHT, $vertex, $weight);
 
         # How many neighbors does the vertex have?
-        my $n_neighbors = keys %{ $self->{matrix}{$vertex} };
+        my $n_neighbors = keys %{ $self->{data}{$vertex} };
 
         # Distribute the weight to all outgoing edges.
         my $new_weight = $weight / $n_neighbors;
-        for my $neighbor (keys %{ $self->{matrix}{$vertex} }) {
-            # Reset the matrix value.
-            $self->{matrix}{$vertex}{$neighbor} = $new_weight;
+        for my $neighbor (keys %{ $self->{data}{$vertex} }) {
+            # Reset the data value.
+            $self->{data}{$vertex}{$neighbor} = $new_weight;
             # Reset the outgoing edge.
             $self->set_attribute(WEIGHT, $vertex, $neighbor, $new_weight);
 $self->_debug("$vertex =($new_weight)=> $neighbor: new vertex weight set");
@@ -155,7 +158,7 @@ $self->_debug("adjust the graph weight to $graph_weight");
         }
     }
     elsif (!$self->has_attribute(WEIGHT, $vertex)) {
-        $weight += $_ for values %{ $self->{matrix}{$vertex} };
+        $weight += $_ for values %{ $self->{data}{$vertex} };
         $weight = 0 unless $weight;
 $self->_debug("weight computed as $weight");
         $self->set_attribute(WEIGHT, $vertex, $weight);
@@ -177,8 +180,8 @@ $self->_debug("weight is defined as $weight");
         # Reset the edge weight.
         $self->set_attribute(WEIGHT, $vertex, $neighbor, $weight);
 
-        # Reset the matrix value.
-        $self->{matrix}{$vertex}{$neighbor} = $weight;
+        # Reset the data value.
+        $self->{data}{$vertex}{$neighbor} = $weight;
 $self->_debug("$vertex =($weight)=> $neighbor: new vertex weight set");
 
         # Adjust the graph and vertex weight if we made a change.
@@ -195,8 +198,8 @@ $self->_debug("adjust the vertex weight to $vertex_weight");
         }
     }
     elsif (!$self->has_attribute(WEIGHT, $vertex, $neighbor)) {
-        $weight = $self->{matrix}{$vertex}{$neighbor};
-$self->_debug("weight from the matrix is $weight");
+        $weight = $self->{data}{$vertex}{$neighbor};
+$self->_debug("weight from the data is $weight");
         $self->set_attribute(WEIGHT, $vertex, $neighbor, $weight);
     }
 
@@ -295,15 +298,12 @@ Graph::Weighted - A weighted graph implementation
         [ 0, 0, 0, 0, 0, ], ]  # A vertex with no edges.
   );
 
-  $m = $g->matrix;
+  $data = $g->data;
 
-  $w = $g->graph_weight;
+  $weight = $g->graph_weight;
 
   $heaviest = $g->heaviest_vertices;
   $lightest = $g->lightest_vertices;
-
-  $x = $g->vertex_weight($heaviest->[$i]);
-  $y = $g->vertex_weight($lightest->[$j]);
 
   # You can call the weight aware methods of the
   # Graph::Directed module, of course.
@@ -319,7 +319,7 @@ A weighted graph implementation
 
 A C<Graph::Weighted> object represents a subclass of 
 C<Graph::Directed> with weighted attributes that are taken from a 
-2D matrix (HoH or NxN LoL) of numerical values.
+two dimensional matrix (HoH or NxN LoL) of numerical values.
 
 Initially, the weights of the vertices are set to the sum of their 
 outgoing edge weights.  This is mutable, however, and can be set to 
@@ -345,17 +345,17 @@ zero.
 
 =item data => $HASHREF | $ARRAYREF
 
-Two dimensional hash or (2D, square) array reference to use for 
-vertices and weighted edges.
+Two dimensional hash or (NxN) array reference to use for vertices and 
+weighted edges.
 
 =back
 
 =item load $HASHREF | $ARRAYREF
 
-Turn the given two dimensional hash or (2D, square) array reference 
-into the vertices and weighted edges of a C<Graph> object.
+Turn the given two dimensional hash or (NxN) array reference into the 
+vertices and weighted edges of a C<Graph::Directed> object.
 
-=item matrix
+=item data
 
 Return the two dimensional hash used for vertices and weighted edges.
 
@@ -368,7 +368,7 @@ Get the total weight of the graph, by summing all the vertex weights.
 Return the weight of a vertex.  This method can also be used to set 
 the vertex weight, if a second argument is provided.
 
-(The vertices are just the keys of the matrix, not some glorified 
+(The vertices are just the keys of the data, not some glorified 
 object.)
 
 When the second argument is provided, the weight it represents is 
@@ -381,7 +381,7 @@ Return the weight of an edge between the two given vertices.  This
 method can also be used to set the edge weight, if a third argument 
 is provided.
 
-(The vertices are just the keys of the matrix, not some glorified 
+(The vertices are just the keys of the data, not some glorified 
 object.)
 
 When the third argument is provided, the weight it represents is used
@@ -411,11 +411,11 @@ Print the contents of the argument array with a newline appended.
 
 =head1 SEE ALSO
 
-C<Graph>
+C<Graph::Base>
 
 =head1 TO DO
 
-Handle "capacity graphs" as detailed in the C<Graph> module. 
+Handle "capacity graphs" as detailed in the C<Graph::Base> module.
 
 Handle clusters of vertices and sub-graphs.
 
