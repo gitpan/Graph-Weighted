@@ -1,7 +1,7 @@
 package Graph::Weighted;
 use strict;
 use Carp;
-use vars qw($VERSION); $VERSION = '0.04';
+use vars qw($VERSION); $VERSION = '0.05';
 use base qw(Graph::Directed);
 
 use constant WEIGHT => 'weight';
@@ -51,7 +51,7 @@ $self->_debug('entering load with a '. ref ($data) . ' object');
         # So de-stringification gymnastics have to happen.  Ugh.
         $data = [
             map { [ split ] }
-                sprintf ('%s', "$data") =~ /\[\s([\d\s]*)\s\]/gs
+                sprintf ('%s', "$data") =~ /\[\s([\d\s]+)\s\]/gs
         ];
     }
 
@@ -273,6 +273,20 @@ $self->_debug('exiting lightest_vertices with ['. join (', ', @{ $self->{lightes
     return $self->{lightest_vertices};
 }  # }}}
 
+sub max_weight {  # {{{
+    my $self = shift;
+    return $self->vertex_weight(
+        $self->heaviest_vertices->[0]
+    );
+}  # }}}
+
+sub min_weight {  # {{{
+    my $self = shift;
+    return $self->vertex_weight(
+        $self->lightest_vertices->[0]
+    );
+}  # }}}
+
 1;
 
 __END__
@@ -318,6 +332,9 @@ Graph::Weighted - A weighted graph implementation
 
   $heavies = $g->heaviest_vertices;
   $lights  = $g->lightest_vertices;
+
+  $x = $g->max_weight;  # Equal to the $heavies.
+  $y = $g->min_weight;  # Equal to the $lights.
 
   # Call any methods of the inherited Graph module.
   @v = $g->vertices;
@@ -421,6 +438,14 @@ Return the array reference of vertices with the most weight.
 =item lightest_vertices
 
 Return the array reference of vertices with the least weight.
+
+=item max_weight
+
+Return the weight of the heaviest vertices.
+
+=item min_weight
+
+Return the weight of the lightest vertices.
 
 =back
 

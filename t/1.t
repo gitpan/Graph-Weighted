@@ -1,4 +1,4 @@
-use Test::More tests => 53;
+use Test::More tests => 55;
 BEGIN { use_ok 'Graph::Weighted' };
 
 my $matrix = [
@@ -128,6 +128,8 @@ my $w = $g->graph_weight;
 is $w, 13, 'graph_weight computed';
 is_deeply $g->lightest_vertices, ['e'], 'lightest vertices computed';
 is_deeply $g->heaviest_vertices, ['c'], 'heaviest vertices computed';
+is $g->max_weight, 5, 'max weight calculated';
+is $g->min_weight, 0, 'min weight calculated';
 
 # Set the vertices used.
 my ($p, $q, $r) = qw(a b c);

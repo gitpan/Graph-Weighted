@@ -34,3 +34,9 @@ Revision history for Graph::Weighted.
       objects (without requiring that the modules be loaded).
     - Added conditional tests for these, of course.
     - Updated documentation, appropriately.
+
+0.05  Wed Jul 2
+    - Changed a * to a + in the load from MatrixBool RE.
+    - Added the min and max _weight methods.
+    - Updated documentation and test suite, accordingly.
+    - Fixed this file again. Grrrr.
