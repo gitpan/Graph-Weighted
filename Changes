@@ -1,4 +1,4 @@
-Revision history for Perl extension Graph::WeightedNet.
+Revision history for Graph::Weighted.
 
 0.01  Tue Jun 17 11:08:36 2003
     - original version; created by h2xs 1.22 with options
@@ -6,3 +6,14 @@ Revision history for Perl extension Graph::WeightedNet.
 
 0.01.1  Sun Jun 29
     - Fixed documentation.
+
+0.02  Sun Jun 29
+    - Removed the unneccessary "reset_graph" method.
+    - Added the forgotten "edgeless vertex" condition to the load(LoL)
+      method.
+    - Fixed the "edgeless vertex" condition semantics in the HoH and 
+      LoL load method cases.
+    - Fixed test messages.
+    - Fixed the text of this file.
+    - Added better test conditions for the "zero_edges" flag setting.
+    - Handled Math::MatrixReal objects in the load method.
