@@ -1,4 +1,4 @@
-Revision history for Graph::Weighted.
+Revision history for Graph::Weighted
 
 0.01  Tue Jun 17 11:08:36 2003
     - original version; created by h2xs 1.22 with options
@@ -44,3 +44,6 @@ Revision history for Graph::Weighted.
     - Removed the unneccessary graph_weight computation in the
       constructor.
     - Fixed innocuous documentation typo.
+
+0.06  Thu Jul 3
+    - Added initialization for the heaviest and lightest vertex lists.

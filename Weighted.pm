@@ -1,7 +1,7 @@
 package Graph::Weighted;
 use strict;
 use Carp;
-use vars qw($VERSION); $VERSION = '0.05.1';
+use vars qw($VERSION); $VERSION = '0.06';
 use base qw(Graph::Directed);
 
 use constant WEIGHT => 'weight';
@@ -225,6 +225,8 @@ sub heaviest_vertices {  # {{{
 $self->_debug('entering heaviest_vertices');
 
     unless (defined $self->{heaviest_vertices}) {
+        $self->{heaviest_vertices} = [];
+
         my $heavy = 0;
 
         for ($self->vertices) {
@@ -250,6 +252,8 @@ sub lightest_vertices {  # {{{
 $self->_debug('entering lightest_vertices');
 
     unless (defined $self->{lightest_vertices}) {
+        $self->{lightest_vertices} = [];
+
         my $light;
 
         for ($self->vertices) {
