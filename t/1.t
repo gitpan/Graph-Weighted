@@ -1,4 +1,4 @@
-use Test::More tests => 55;
+use Test::More tests => 57;
 BEGIN { use_ok 'Graph::Weighted' };
 
 my $matrix = [
@@ -26,6 +26,22 @@ eval {
 };
 isa_ok $g, 'Graph::Weighted';
 ok !$@, 'created a G::W object with no arguments';
+
+# creation with empty data references.
+eval {
+    $g = Graph::Weighted->new(
+    #    debug => 1,
+        data => [],
+    );
+};
+eval {
+ok !$@, 'creation with empty data LoL';
+    $g = Graph::Weighted->new(
+    #    debug => 1,
+        data => {},
+    );
+};
+ok !$@, 'creation with empty data HoH';
 
 # loading and LoL -> HoH
 $g = Graph::Weighted->new(

@@ -47,3 +47,8 @@ Revision history for Graph::Weighted
 
 0.06  Thu Jul 3
     - Added initialization for the heaviest and lightest vertex lists.
+
+0.07  Fri Jul 4
+    - Added tests for empty data references.
+    - Added croaks for undefined vertices in the vertex_ and 
+      edge_weight methods.

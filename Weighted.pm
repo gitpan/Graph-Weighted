@@ -1,7 +1,7 @@
 package Graph::Weighted;
 use strict;
 use Carp;
-use vars qw($VERSION); $VERSION = '0.06';
+use vars qw($VERSION); $VERSION = '0.07';
 use base qw(Graph::Directed);
 
 use constant WEIGHT => 'weight';
@@ -139,6 +139,8 @@ $self->_debug('exiting graph_weight');
 sub vertex_weight {  # {{{
     my ($self, $vertex, $weight) = @_;
 $self->_debug("entering vertex_weight with $vertex");
+    croak "Can't compute the weight of an undefined vertex."
+        unless defined $vertex;
 
     if (defined $weight) {
         # Distribute the weight to all outgoing edges.
@@ -184,6 +186,8 @@ $self->_debug('exiting vertex_weight');
 sub edge_weight {  # {{{
     my ($self, $vertex, $successor, $weight) = @_;
 $self->_debug("entering edge_weight with $vertex and $successor");
+    croak "Can't compute the weight of an edge bounded by undefined vertices."
+        unless defined $vertex && defined $successor;
 
     if (defined $weight) {
 $self->_debug("weight is defined as $weight");
