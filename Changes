@@ -66,3 +66,13 @@ Revision history for Graph::Weighted
       tests to be,
         $g = eval { G::W->new(...) }; isa_ok $g, GW, 'blah blah'
       Thank you Andy Lester!
+
+0.10  Wed 30 2003
+    - Wow.  Where should I begin...
+    - Basically, I refactored every single method to accept an
+      attribute argument or use a class default.
+    - Added Capacity.pm as an expression of this.
+    - Updated the Weighted.pm documentatiion to detail this new
+      generic API.
+    - Made tests for the default behavior and Capacity.pm, as nearly
+      identical copies of the original (for Weighted.pm).
