@@ -1,7 +1,7 @@
 package Graph::Weighted;
 use strict;
 use Carp;
-use vars qw($VERSION); $VERSION = '0.08';
+use vars qw($VERSION); $VERSION = '0.08.1';
 use base qw(Graph::Directed);
 
 use constant WEIGHT => 'weight';
@@ -347,10 +347,6 @@ Graph::Weighted - A weighted graph implementation
   $z = $g->MST_Kruskal;
   $z = $g->APSP_Floyd_Warshall;
   $z = $g->MST_Prim($p);
-
-=head1 ABSTRACT
-
-A weighted graph implementation
 
 =head1 DESCRIPTION
 
