@@ -1,4 +1,4 @@
-use Test::More tests => 51;
+use Test::More tests => 53;
 BEGIN { use_ok 'Graph::Weighted' };
 
 my $matrix = [
@@ -32,7 +32,7 @@ $g = Graph::Weighted->new(
 #    debug => 1,
 );
 eval { $g->load($matrix) };
-ok !$@, 'LoL load succeeded';
+ok !$@, 'LoL load';
 is_deeply $g->data, $data, 'HoH constructed from LoL';
 
 # zero_edges
@@ -52,17 +52,41 @@ is_deeply $g->data, $data, 'zero_edges HoH constructed from LoL';
 is $g->edge_weight(4, $_), 0, "4 =(0)=> $_: edge weight defined"
     for sort keys %$data;
 
-# Math::MatrixReal
+# Matrix objects
 SKIP: {
+    $data = [ [1, 2], [3, 4] ];
+
+    eval { require Math::Matrix };
+    skip "Math::Matrix not installed", 1 if $@;
+    eval {
+        $g = Graph::Weighted->new(
+#            debug => 1,
+            data => Math::Matrix->new($data),
+        );
+    };
+    ok !$@, 'creation from Math::Matrix object';
+
     eval { require Math::MatrixReal };
     skip "Math::MatrixReal not installed", 1 if $@;
     eval {
         $g = Graph::Weighted->new(
 #            debug => 1,
-            data => Math::MatrixReal->new_from_rows([[1, 2], [3, 4]]),
+            data => Math::MatrixReal->new_from_rows($data),
         );
     };
-    ok !$@, 'Math::MatrixReal object creation succeeded';
+    ok !$@, 'creation from Math::MatrixReal object';
+
+    eval { require Math::MatrixBool };
+    skip "Math::MatrixBool not installed", 1 if $@;
+    eval {
+        $g = Graph::Weighted->new(
+#            debug => 1,
+            data => Math::MatrixBool->new_from_string(
+                "[ 1 0 0 ]\n[ 1 1 0 ]\n[ 1 1 1 ]\n"
+            ),
+        );
+    };
+    ok !$@, 'creation from Math::MatrixBool object';
 }
 
 # non-square
@@ -89,7 +113,7 @@ eval {
         },
     );
 };
-ok !$@, 'zero_edges object creation with HoH succeeded';
+ok !$@, 'zero_edges object creation with HoH';
 
 # Edges? We don' need no steenking edges!
 my @e = $g->edges();

@@ -25,3 +25,12 @@ Revision history for Graph::Weighted.
     - Added a conditional test for Math::MatrixReal.
     - Renamed the "matrix" accessor to "data", since a HoH is not
       really a matrix.
+
+0.04  Mon Jun 30
+    - Changed the variables called "neighbor(s)" to "successor(s)",
+      because what I was thinking of as neighbors were actually
+      successors.
+    - Made the load method handle Math::Matrix and Math::MatrixBool
+      objects (without requiring that the modules be loaded).
+    - Added conditional tests for these, of course.
+    - Updated documentation, appropriately.
