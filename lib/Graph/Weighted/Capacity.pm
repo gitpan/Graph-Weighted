@@ -1,7 +1,7 @@
 package Graph::Weighted::Capacity;
 use strict;
 use Carp;
-use vars qw($VERSION); $VERSION = '0.02';
+use vars qw($VERSION); $VERSION = '0.03';
 use base qw(Graph::Weighted);
 
 use constant CAPACITY => 'capacity';
@@ -22,6 +22,10 @@ sub load_capacity  { shift->load(@_, CAPACITY) }
 sub capacity_data  { shift->data(@_, CAPACITY) }
 
 sub graph_capacity { shift->graph_attr(@_, CAPACITY) }
+
+sub fullest_vertices { shift->fullest_vertices(CAPACITY) }
+
+sub emptiest_vertices { shift->emptiest_vertices(CAPACITY) }
 
 sub max_capacity   { shift->max_attr(CAPACITY) }
 
@@ -146,15 +150,6 @@ Flag to invoke verbose mode while processing.  Defaults to zero.
 Flag to add edges between vertices with a capacity of zero.  Defaults 
 to zero.
 
-=item default_attribute => STRING
-
-The attribute to use by default, if the generic (C<load>, C<data>, 
-and C<*_attr>) methods are called without an attribute as an 
-argument (which should never actually happen, if you are doing thing 
-corrdctly).
-
-This is set to 'weight', by default, of course.
-
 =item data => $HASHREF | $ARRAYREF | $OBJECT
 
 Two dimensional hash (HoH), (NxN) array, or object reference to use 
@@ -165,7 +160,7 @@ can also be loaded.
 
 =item retrieve_as => 'HASH' | 'ARRAY'
 
-Flag to tell the C<weight_data> method to output as a hash or array
+Flag to tell the C<capacity_data> method to output as a hash or array
 reference.  Defaults to C<HASH>.
 
 If this object attribute is set to C<ARRAY>, the C<zero_edges> 
@@ -184,7 +179,7 @@ can also be loaded.
 =item * capacity_data
 
 Return a two dimensional representation of the vertices and all their 
-weighted edges.
+capacity edges.
 
 The representation can be either a hash or array reference, depending
 on the C<retrieve_as> object attribute setting.
@@ -214,7 +209,7 @@ to replace the capacity of the edge between the vertex (first argument)
 and it's successor (second argument).  Finally, the capacity of the 
 vertex and the total capacity of the graph are adjusted accordingly.
 
-=item * largest_vertices
+=item * fullest_vertices
 
 Return an array reference of vertices with the most capacity.
 

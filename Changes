@@ -82,3 +82,14 @@ Revision history for Graph::Weighted
     - Added the "retrieve_as" attribute to the class so that the data
       can be pulled out as either a hash or array reference.
     - Enhanced documentation all over, in Weighted.pm and Capacity.pm.
+
+0.12  Thu Jul 31 2003
+    - Oof!  Forgot the "Graph/" part of the paths in the distro and
+      the Makefile.PL.
+
+0.13  Fri Aug  1 2003
+    - Tweezed the cargo-culted cruft from the Capacity.pm
+      documentation.
+    - Added the forgotten "fullest" and "emptiest" methods to
+      Capacity.pm.
+    - Enhanced the API Methods documentation section in Weighted.pm.

@@ -1,7 +1,7 @@
 package Graph::Weighted;
 use strict;
 use Carp;
-use vars qw($VERSION); $VERSION = '0.12';
+use vars qw($VERSION); $VERSION = '0.13';
 use base qw(Graph::Directed);
 
 use constant WEIGHT => 'weight';
@@ -625,7 +625,8 @@ weights.
 
 =item * vertex_weight $VERTEX [, $WEIGHT]
 
-Return the weight of a vertex.
+Return the weight of a vertex, which is the sum of the successor edge
+weights.
 
 (The vertices are just the keys of the data, not some glorified 
 object, by the way.)
@@ -741,9 +742,10 @@ on the C<retrieve_as> object attribute setting.
 
   $x = $g->graph_attr($attr);
 
-=item * vertex_attr $VERTEX [, $VALUE] [, $ATTR]
+Get the total value of the across the entire graph, which is the sum 
+of the vertex attributes.
 
-This method requires named parameters.
+=item * vertex_attr $VERTEX [, $VALUE] [, $ATTR]
 
   $x = $g->vertex_attr(
       vertex => $v,
@@ -751,9 +753,12 @@ This method requires named parameters.
       attr => $attr,
   );
 
-=item * edge_attr $VERTEX, $SUCCESSOR [, $VALUE] [, $ATTR]
+Return the attribute value of a vertex, which is the sum of the 
+successor edge attribute values.
 
-This method requires named parameters.
+This generic API method requires named parameters.
+
+=item * edge_attr $VERTEX, $SUCCESSOR [, $VALUE] [, $ATTR]
 
   $x = $g->edge_attr(
       vertex => $v,
@@ -762,21 +767,37 @@ This method requires named parameters.
       attr => $attr,
   );
 
+Return the attribute value of an edge between the two given vertices.
+
+This generic API method requires named parameters.
+
 =item * largest_vertices [$ATTR]
 
   $array_ref = $g->largest_vertices($attr);
+
+Return an array reference of vertices with the largest value of the
+given attribute.
 
 =item * smallest_vertices [$ATTR]
 
   $array_ref = $g->smallest_vertices($attr);
 
+Return an array reference of vertices with the smallest value of the
+given attribute.
+
 =item * max_attr [$ATTR]
 
   $x = $g->max_attr($attr);
 
+Return the attribute value of the "largest" vertices (as defined 
+above).
+
 =item * min_attr [$ATTR]
 
   $x = $g->min_attr($attr);
+
+Return the attribute value of the "smallest" vertices (as defined 
+above).
 
 =back
 
