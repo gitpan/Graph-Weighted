@@ -1,7 +1,7 @@
 package Graph::Weighted;
 use strict;
 use Carp;
-use vars qw($VERSION); $VERSION = '0.05';
+use vars qw($VERSION); $VERSION = '0.05.1';
 use base qw(Graph::Directed);
 
 use constant WEIGHT => 'weight';
@@ -18,10 +18,7 @@ sub new {  # {{{
 
     bless $self, $class;
 
-    if ($args{data}) {
-        $self->load($args{data});
-        $self->graph_weight;
-    }
+    $self->load($args{data}) if $args{data};
 
     return $self;
 }  # }}}
@@ -44,7 +41,7 @@ $self->_debug('entering load with a '. ref ($data) . ' object');
 
     if (ref ($data) eq 'Math::MatrixBool') {
         # Math::MatrixBool objects are actually Bit::Vectors, that
-        # can be output by "stringification, like this:
+        # can be output by "stringification", like this:
         # [ 1 0 0 ]
         # [ 1 1 0 ]
         # [ 1 1 1 ]
@@ -465,15 +462,15 @@ C<Graph::Base>
 
 =head1 TO DO
 
-Handle "capacity graphs" as detailed in the C<Graph::Base> module.
-
 Handle clusters of vertices and sub-graphs.
+
+Handle "capacity graphs" as detailed in the C<Graph::Base> module?
 
 Handle Math::MatrixSparse and PDL::Matrix objects?
 
 =head1 AUTHOR
 
-Gene Boggs E<lt>cpan@ology.netE<gt>
+Gene Boggs E<lt>gene@cpan@.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 

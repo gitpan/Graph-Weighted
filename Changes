@@ -39,4 +39,8 @@ Revision history for Graph::Weighted.
     - Changed a * to a + in the load from MatrixBool RE.
     - Added the min and max _weight methods.
     - Updated documentation and test suite, accordingly.
-    - Fixed this file again. Grrrr.
+
+0.05.1  Wed Jul 2
+    - Removed the unneccessary graph_weight computation in the
+      constructor.
+    - Fixed innocuous documentation typo.
