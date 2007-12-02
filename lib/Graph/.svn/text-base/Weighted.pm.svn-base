@@ -1,4 +1,4 @@
-# $Id: Weighted.pm 782 2007-12-02 01:41:34Z gene $
+# $Id$
 package Graph::Weighted;
 our $VERSION = '0.14_1';
 use strict;
@@ -10,7 +10,7 @@ __END__
 
 =head1 NAME
 
-Graph::Weighted - OBSOLETE - An abstract, weighted graph implementation
+Graph::Weighted - An abstract, weighted graph implementation - OBSOLETE
 
 =head1 DESCRIPTION
 
