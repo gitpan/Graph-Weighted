@@ -1,85 +1,17 @@
-Revision history for Graph::Weighted
+Revision history for Graph-Drawing:
 
-0.01  Tue Jun 17 11:08:36 2003
-    - original version; created by h2xs 1.22 with options -A -X -n Graph::WeightedNet
+0.5 May 14, 2012
+    - Starting over with simplified bits and dzil based distribution.
 
-0.01.1  Sun Jun 29
-    - Fixed documentation.
-
-0.02  Sun Jun 29
-    - Removed the unneccessary "reset_graph" method.
-    - Added the forgotten "edgeless vertex" condition to the load(LoL) method.
-    - Fixed the "edgeless vertex" condition semantics in the HoH and LoL load method cases.
-    - Fixed test messages.
-    - Fixed the text of this file.
-    - Added better test conditions for the "zero_edges" flag setting.
-    - Handled Math::MatrixReal objects in the load method.
-
-0.03  Sun Jun 29
-    - Fixed the README.
-    - Fixed and enhanced the documentation.
-    - Refactored the test script, big time.
-    - Added a conditional test for Math::MatrixReal.
-    - Renamed the "matrix" accessor to "data", since a HoH is not really a matrix.
-
-0.04  Mon Jun 30
-    - Changed the variables called "neighbor(s)" to "successor(s)", because what I was thinking of as neighbors were actually successors.
-    - Made the load method handle Math::Matrix and Math::MatrixBool objects (without requiring that the modules be loaded).
-    - Added conditional tests for these, of course.
-    - Updated documentation, appropriately.
-
-0.05  Wed Jul 2
-    - Changed a * to a + in the load from MatrixBool RE.
-    - Added the min and max _weight methods.
-    - Updated documentation and test suite, accordingly.
-
-0.05.1  Wed Jul 2
-    - Removed the unneccessary graph_weight computation in the constructor.
-    - Fixed innocuous documentation typo.
-
-0.06  Thu Jul 3
-    - Added initialization for the heaviest and lightest vertex lists.
-
-0.07  Fri Jul 4
-    - Added tests for empty data references.
-    - Added croaks for undefined vertices in the vertex_ and edge_weight methods.
-
-0.08  Fri Jul 11 2003
-    - Enhanced the documentation.
-
-0.08.1  Fri Jul 11 2003
-    - Excised the unnecessary =head1 ABSTRACT section.
-
-0.09  Tue Jul 14 2003
-    - Fixed my malformed matrix skip tests.  Thank you Randy Kobes!
-    - Fixed my
-        eval { $g = G::W->new(...) }; ok !$@, 'blah blah';
-      tests to be,
-        $g = eval { G::W->new(...) }; isa_ok $g, GW, 'blah blah'
-      Thank you Andy Lester!
-
-0.10  Wed Jul 30 2003
-    - Wow.  Where should I begin...
-    - Basically, I refactored every single method to accept an attribute argument or use a class default.
-    - Added Capacity.pm as an expression of this.
-    - Updated the Weighted.pm documentatiion to detail this new generic API.
-    - Made tests for the default behavior and Capacity.pm, as nearly identical copies of the original (for Weighted.pm).
-
-0.11  Thu Jul 31 2003
-    - Whoopsy.  Left unnecessary tests in capacity.t.
-    - Added the "retrieve_as" attribute to the class so that the data can be pulled out as either a hash or array reference.
-    - Enhanced documentation all over, in Weighted.pm and Capacity.pm.
-
-0.12  Thu Jul 31 2003
-    - Oof!  Forgot the "Graph/" part of the paths in the distro and the Makefile.PL.
-
-0.13  Fri Aug  1 2003
-    - Tweezed the cargo-culted cruft from the Capacity.pm documentation.
-    - Added the forgotten "fullest" and "emptiest" methods to Capacity.pm.
-    - Enhanced the API Methods documentation section in Weighted.pm.
-
-0.1301  Sun Sep 27 2003
-    - Made $VERSION a real number and put it on it's own line.
-
-00.14_1   Sat Dec 1 2007
-    - Retired because the parent has weight functionality now.
+0.0902_1.tar.gz            29-Sep-2004 19:03  3.2K
+0.09.tar.gz                31-Jul-2003 12:18   10K
+0.08.tar.gz                11-Jul-2003 16:43   10K
+0.07.tar.gz                10-Jul-2003 19:16  9.9K
+0.06.tar.gz                10-Jul-2003 09:17  9.0K
+0.05.tar.gz                09-Jul-2003 20:38  8.9K
+0.4.tar.gz                 05-Jul-2003 09:33   59K
+0.3.tar.gz                 04-Jul-2003 19:34   11K
+0.2.tar.gz                 04-Jul-2003 16:50   12K
+0.01.2.tar.gz              04-Jul-2003 13:16  7.4K
+0.01.1.tar.gz              04-Jul-2003 08:39  7.4K
+0.01.tar.gz                03-Jul-2003 17:37  7.2K

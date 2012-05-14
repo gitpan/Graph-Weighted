@@ -1,4 +1,13 @@
-Graph/Weighted distribution
-===========================
 
-This distribution has been retired.  Please use Graph.pm instead.
+
+This archive contains the distribution Graph-Weighted,
+version 0.5:
+
+  A weighted graph implementation
+
+This software is copyright (c) 2012 by Gene Boggs.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+
