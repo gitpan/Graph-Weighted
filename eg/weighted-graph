@@ -1,53 +1,23 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
+use Graph::Weighted;
+my $g = Graph::Weighted->new;
+my $data = [
+    [ 0, 1, 2, 0, 0, ],
+    [ 1, 0, 3, 0, 0, ],
+    [ 2, 3, 0, 0, 0, ],
+    [ 0, 0, 1, 0, 0, ],
+    [ 0, 0, 0, 0, 0, ],
+];
+$g->populate($data);
 
-use Graph;
-
-my $g = Graph->new; # Graph object.
-
-my $data = 
-    [      [1],      [0, 2],      [1],      [], ]
-#    { 0 => [1], 1 => [0, 2], 2 => [1], 3 => [], }
-;
-
-my $weight_function = sub {
-    my $current = shift;
-    return 666 * $current;
-};
-
-# Populate the graph.
-if (ref $data eq 'ARRAY') {
-    my $vertex = 0; # Initial vertex id.
-    for my $neighbors (@$data) {
-        add_weighted_edges($g, $vertex, $neighbors);
-        $vertex++; # Move on to the next vertex...
-    }
-}
-elsif (ref $data eq 'HASH') {
-    for my $vertex (keys %$data) {
-        add_weighted_edges($g, $vertex, $data->{$vertex});
-    }
-}
-#use Data::Dumper;warn Data::Dumper->new([$g])->Indent(1)->Terse(1)->Sortkeys(1)->Dump;
-
-sub add_weighted_edges {
-    my ($g, $vertex, $neighbors) = @_;
-    my $weight = 0; # Initial vertex weight
-    # Make edges.
-    for my $n (@$neighbors) {
-        warn "Edge: $vertex -> $n\n";
-        $g->add_edge($vertex, $n);
-        $weight = compute_weight($weight);#, $weight_function);
-    }
-    $g->set_vertex_weight($vertex, $weight);
-    warn "\tWeight of $vertex is $weight\n";
+for my $v ($g->vertices) {
+    my $w = $g->get_weight($v);
+warn"V: $v = $w\n";
 }
 
-sub compute_weight {
-    my ($current, $function) = @_;
-    # Call the weigh function with if one is given.
-    return $function->($current) if $function and ref $function eq 'CODE';
-    # Increment the current value if no weight function is given.
-    return ++$current;
+for my $e ($g->edges) {
+    my $w = $g->get_edge_weight(@$e);
+warn"E: @$e = $w\n";
 }

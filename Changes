@@ -1,5 +1,8 @@
 Revision history for Graph-Drawing:
 
+0.51 May 15, 2012
+    - Allow weighting of both edges and vertices.
+
 0.5 May 14, 2012
     - Starting over with simplified bits and dzil based distribution.
 
