@@ -1,5 +1,10 @@
 Revision history for Graph-Drawing:
 
+0.52 May 17, 2012
+    - Removed polar chart examples.
+    - Enabled data hash handling.
+    - Improved POD.
+
 0.51 May 15, 2012
     - Allow weighting of both edges and vertices.
 

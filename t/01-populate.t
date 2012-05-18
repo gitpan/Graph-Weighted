@@ -62,7 +62,7 @@ $n = 0;
 for my $data (@$magnitude_dataset) {
     my $g = eval { Graph::Weighted->new() };
     isa_ok $g, GW, "magnitude $n";
-    eval { $g->populate($data, '', 'magnitude') };
+    eval { $g->populate($data, 'magnitude') };
     print $@ if $@;
     ok !$@, "populate magnitude data $n";
     my $g_weight = 0;
@@ -97,7 +97,7 @@ diag 'Test both weight and magnitude LoL...';
     my $w = _weight_of($weight_dataset->[-1]);
     is $g_weight, $w, "weight: $g_weight = $w";
 
-    eval { $g->populate($magnitude_dataset->[-1], '', 'magnitude') };
+    eval { $g->populate($magnitude_dataset->[-1], 'magnitude') };
     print $@ if $@;
     ok !$@, 'populate magnitude data';
     $g_weight = 0;
@@ -115,16 +115,14 @@ diag 'Test both weight and magnitude LoL...';
     }
 }
 
-=pod
 $weight_dataset = [
     {}, # No nodes
-    { 0 => {} }, # 1 node, no edges
-    { 0 => {0 => 1}, 1 => {1 => 1} }, # 2 nodes of self-edges
+    { a => {} }, # 1 node, no edges
+    { a => {a => 1}, b => {b => 1} }, # 2 nodes of self-edges
     # Same as LoL above but with alpha key names:
     { a => {b=>2,c=>1}, b => {a=>3,c=>1}, c => {a=>3,b=>2}, d => {c=>1}, e => {a=>1,b=>1,c=>1,d=>1} },
 ];
 diag 'Test weight HoH...';
-$n = 0;
 for my $data (@$weight_dataset) {
     my $g = eval { Graph::Weighted->new() };
     isa_ok $g, GW, "weight $n";
@@ -140,7 +138,6 @@ for my $data (@$weight_dataset) {
     is $g_weight, $w, "weight: $g_weight = $w";
     $n++;
 }
-=cut
 
 # Return total sum of a 2D numeric value data structure.
 sub _weight_of {
@@ -152,7 +149,7 @@ sub _weight_of {
         }
     }
     elsif (ref $data eq 'HASH') {
-        for my $i (keys %$data) {
+        for my $i (values %$data) {
             $weight += $_ for values %$i;
         }
     }
