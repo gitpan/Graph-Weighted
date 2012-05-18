@@ -4,7 +4,7 @@ package Graph::Weighted;
 use warnings;
 use strict;
 
-our $VERSION = '0.52';
+our $VERSION = '0.5201';
 
 use base qw(Graph);
 
@@ -120,12 +120,12 @@ sub get_attr {
     my ($self, $v, $attr) = @_;
     die 'ERROR: No vertex given to get_attr()' unless defined $v;
     $attr ||= WEIGHT;
-    warn"get_attr($v, $attr)\n" if DEBUG;
+    warn "get_attr($v, $attr)\n" if DEBUG;
     if (ref $v eq 'ARRAY') {
-        return $self->get_edge_attribute(@$v, $attr);
+        return $self->get_edge_attribute(@$v, $attr) || 0;
     }
     else {
-        return $self->get_vertex_attribute($v, $attr);
+        return $self->get_vertex_attribute($v, $attr) || 0;
     }
 }
 
@@ -140,41 +140,44 @@ Graph::Weighted - A weighted graph implementation
 
   use Graph::Weighted;
   my $g = Graph::Weighted->new();
+  my $attr = 'magnitude';
   $g->populate(
-    [
-        [ 0, 1, 2, 0, 0 ], # Vertex with 5 edges of weight 3
-        [ 1, 0, 3, 0, 0 ], #               "               4
-        [ 2, 3, 0, 0, 0 ], #               "               5
-        [ 0, 0, 1, 0, 0 ], #               "               1
-        [ 0, 0, 0, 0, 0 ], #               "               0
+    [ [ 0, 1, 2, 0, 0 ], # Vertex 0 with 5 edges of weight 3
+      [ 1, 0, 3, 0, 0 ], #    "   1        "               4
+      [ 2, 3, 0, 0, 0 ], #    "   2        "               5
+      [ 0, 0, 1, 0, 0 ], #    "   3        "               1
+      [ 0, 0, 0, 0, 0 ], #    "   4        "               0
     ]
   );
   $g->populate(
-    {
-        0 => { 1=>2, 2=>1 },             # Vertex with 2 edges of weight 3
-        1 => { 0=>3, 2=>1 },             #      "      2        "        4
-        2 => { 0=>3, 1=>2 },             #      "      2        "        5
-        3 => { 1=>2 },                   #      "      1        "        2
-        4 => { 0=>1, 1=>1, 2=>1, 3=>1 }, #      "      4        "        4
+    { 0 => { 1=>2, 2=>1 },             # Vertex with 2 edges of weight 3
+      1 => { 0=>3, 2=>1 },             #      "      2        "        4
+      2 => { 0=>3, 1=>2 },             #      "      2        "        5
+      3 => { 1=>2 },                   #      "      1        "        2
+      4 => { 0=>1, 1=>1, 2=>1, 3=>1 }, #      "      4        "        4
     },
-    'magnitude'
+    $attr
   );
-  for my $v ($g->vertices) {
-    my $w = $g->get_weight($v) || 0;
-    warn "V: $v = $w\n";
-  }
-  for my $e ($g->edges) {
-    my $w = $g->get_weight($e) || 0;
-    my $m = $g->get_attr($e, 'magnitude') || 0;
-    warn "E: @$e = $w $m\n";
+  # Show each vertex and its edges.
+  for my $v (sort { $a <=> $b } $g->vertices) {
+     warn sprintf "V: %s w=%.2f, %s=%.2f\n",
+        $v,
+        $g->get_weight($v),
+        $attr, $g->get_attr($v, $attr);
+     for my $n (sort { $a <=> $b } $g->neighbors($v)) {
+        warn sprintf "\tE: >%s w=%.2f, %s=%.2f\n",
+            $n,
+            $g->get_weight([$v, $n]),
+            $attr, $g->get_attr([$v, $n], $attr);
+    }
   }
 
 =head1 DESCRIPTION
 
 A C<Graph::Weighted> object is a subclass of C<Graph> with weighted
 attributes.  As such, all of the C<Graph> methods may be used as
-documented.  This module is a streamlined, simplified version of the
-weight based accessors provided by the C<Graph> module.
+documented.  This module is a streamlined version of the weight based
+accessors provided by the C<Graph> module.
 
 =head1 METHODS
 
@@ -240,8 +243,8 @@ graph, for nodes of different attributes.
 
   $g->get_weight($vertex);
   $g->get_attr($vertex, $attribute);
-  $g->get_weight($edge);
-  $g->get_attr($edge, $attribute);
+  $g->get_weight(\@edge);
+  $g->get_attr(\@edge, $attribute);
 
 Return the attribute value for the vertex or edge.  A vertex is a
 numeric value.  An edge is an array reference with 2 elements.
@@ -249,6 +252,8 @@ numeric value.  An edge is an array reference with 2 elements.
 =head1 TO DO
 
 Accept hashrefs and C<Matrix::*> objects instead of just LoLs.
+
+Also, possibly L<Statistics::Descriptive::Weighted>
 
 Make subroutines for finding the heaviest and lightest nodes.
 
@@ -258,7 +263,7 @@ Make subroutines for finding the total weight beneath a node.
 
 L<Graph>
 
-The F<t/*> sources.
+The F<eg/> and F<t/*> sources.
 
 =head1 AUTHOR
 

@@ -1,5 +1,10 @@
 Revision history for Graph-Drawing:
 
+0.5201 May 18, 2012
+    - Made get_attr() return zero if no attribute value is found.
+    - Simplified the example script.
+    - Improved POD.
+
 0.52 May 17, 2012
     - Removed polar chart examples.
     - Enabled data hash handling.
