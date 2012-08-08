@@ -1,5 +1,11 @@
 Revision history for Graph-Drawing:
 
+0.53 Aug 8, 2012
+    - Added dzil helper plugins to dist creation.
+    - Use (and test) both vertex and edge methods!
+    - Fix up POD.
+    - Handle terminal nodes for hash datapoints.
+
 0.5201 May 18, 2012
     - Made get_attr() return zero if no attribute value is found.
     - Simplified the example script.

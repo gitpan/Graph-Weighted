@@ -1,6 +1,7 @@
 Changes
 LICENSE
 MANIFEST
+META.json
 META.yml
 Makefile.PL
 README
@@ -9,3 +10,6 @@ eg/weighted-graph
 lib/Graph/Weighted.pm
 t/00-load.t
 t/01-populate.t
+t/02-user-methods.t
+t/TestData.pm
+t/author-pod-spell.t
