@@ -121,6 +121,7 @@ $weight_dataset = [
     { a => {a => 1}, b => {b => 1} }, # 2 nodes of self-edges
     # Same as LoL above but with alpha key names:
     { a => {b=>2,c=>1}, b => {a=>3,c=>1}, c => {a=>3,b=>2}, d => {c=>1}, e => {a=>1,b=>1,c=>1,d=>1} },
+    { a => 123, b => 321, c => {a => 0.4, b => 0.6} }, # Terminal values
 ];
 diag 'Test weight HoH...';
 for my $data (@$weight_dataset) {
@@ -150,7 +151,12 @@ sub _weight_of {
     }
     elsif (ref $data eq 'HASH') {
         for my $i (values %$data) {
-            $weight += $_ for values %$i;
+            if (ref $i eq 'HASH') {
+                $weight += $_ for values %$i;
+            }
+            else { # We are probably on a terminal (literal) value.
+                $weight += $i;
+            }
         }
     }
     return $weight;

@@ -1,5 +1,9 @@
 Revision history for Graph-Drawing:
 
+0.5301 Aug 8, 2012
+    - Improve documentation.
+    - Test for terminal values.
+
 0.53 Aug 8, 2012
     - Added dzil helper plugins to dist creation.
     - Use (and test) both vertex and edge methods!

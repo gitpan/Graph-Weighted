@@ -4,7 +4,7 @@ BEGIN {
 }
 # ABSTRACT: A weighted graph implementation
 
-our $VERSION = '0.53';
+our $VERSION = '0.5301';
 
 use warnings;
 use strict;
@@ -14,12 +14,14 @@ use base qw(Graph);
 use constant DEBUG  => 0;
 use constant WEIGHT => 'weight';
 
+
 sub new {
     my $class = shift;
     my $self = $class->SUPER::new();
     bless $self, $class;
     return $self;
 }
+
 
 sub populate {
     my ($self, $data, $attr, $vertex_method, $edge_method) = @_;
@@ -139,10 +141,12 @@ sub _compute_vertex_weight {
     return $weight + $current;
 }
 
+
 sub get_weight {
     my $self = shift;
     return $self->get_attr(@_);
 }
+
 
 sub get_attr {
     my ($self, $v, $attr) = @_;
@@ -170,13 +174,12 @@ Graph::Weighted - A weighted graph implementation
 
 =head1 VERSION
 
-version 0.53
+version 0.5301
 
 =head1 SYNOPSIS
 
   use Graph::Weighted;
-  my $g = Graph::Weighted->new();
-  my $attr = 'magnitude';
+
   $g->populate(
     [ [ 0, 1, 2, 0, 0 ], # Vertex 0 with 5 edges of weight 3
       [ 1, 0, 3, 0, 0 ], #    "   1        "               4
@@ -185,36 +188,33 @@ version 0.53
       [ 0, 0, 0, 0, 0 ], #    "   4        "               0
     ]
   );
+  my $attr = 'magnitude';
   $g->populate(
-    { 0 => { 1=>2, 2=>1 },             # Vertex with 2 edges of weight 3
-      1 => { 0=>3, 2=>1 },             #      "      2        "        4
-      2 => { 0=>3, 1=>2 },             #      "      2        "        5
-      3 => { 1=>2, 5=>1 },             #      "      2        "        3
-      4 => { 0=>1, 1=>1, 2=>1, 3=>1 }, #      "      4        "        4
-      5 => 3.1415,                     # A terminal node!
+    { 0 => { 1 => 4, 3 => 6 },
+      1 => { 0 => 3, 2 => 7 },
+      2 => 8, # Terminal value
+      3 => 9, # Terminal value
     },
     $attr
   );
+
   # Show each vertex and its edges.
   for my $v (sort { $a <=> $b } $g->vertices) {
-     warn sprintf "V: %s w=%.2f, %s=%.2f\n",
-        $v,
-        $g->get_weight($v),
+    warn sprintf "vertex: %s weight=%.2f, %s=%.2f\n",
+        $v, $g->get_weight($v),
         $attr, $g->get_attr($v, $attr);
-     for my $n (sort { $a <=> $b } $g->neighbors($v)) {
-        warn sprintf "\tE: >%s w=%.2f, %s=%.2f\n",
-            $n,
-            $g->get_weight([$v, $n]),
+    next if $g->neighbors($v) == 1;
+    for my $n (sort { $a <=> $b } $g->neighbors($v)) {
+        warn sprintf "\tedge to: %s weight=%.2f, %s=%.2f\n",
+            $n, $g->get_weight([$v, $n]),
             $attr, $g->get_attr([$v, $n], $attr);
     }
   }
 
 =head1 DESCRIPTION
 
-A C<Graph::Weighted> object is a subclass of C<Graph> with weighted
-attributes.  As such, all of the C<Graph> methods may be used as
-documented.  This module is a streamlined version of the weight based
-accessors provided by the C<Graph> module.
+A C<Graph::Weighted> object is a subclass of the L<Graph> module with weighted
+attributes.  As such, all of the C<Graph> methods may be used as documented.
 
 =head1 NAME
 
@@ -231,21 +231,16 @@ See L<Graph> for the possible constructor arguments.
 =head2 populate()
 
   $g->populate(\@vectors)
-  $g->populate(
-    { a => { b=>2, c=>1 },
-      b => { a=>3, c=>1 },
-      c => { a=>3, b=>2 },
-      d => { b=>2 },
-      e => { a=>1, b=>1, c=>1, d=>1 },
-    },
-  );
+  $g->populate(\@vectors, $attribute)
+  $g->populate(\%data_points, $attribute)
 
-Populate a graph with weighted nodes.  Arguments:
+Populate a graph with weighted nodes.
 
-  data          => Array ref of numeric vectors or HASH ref of numeric edge values
-  attribute     => Optional string name
-  vertex_method => Optional code ref weighting function
-  edge_method   => Optional code ref weighting function
+For arguments, C<data> can be a numeric value (a "terminal"), an arrayref of
+numeric vectors or a hashref of numeric edge values.  The C<attribute> is an
+optional string name, with default "weight."  The C<vertex_method> and
+C<edge_method> are optional code-references giving alternate weighting
+functions.
 
 Examples of C<data> in array reference form:
 
@@ -255,14 +250,11 @@ Examples of C<data> in array reference form:
   [0,1]   2 vertices and 2 edges (edge weights 0,1; vertex weight 1)
   [0,1,9] 3 vertices and 3 edges (edge weights 0,1,9; vertex weight 10)
 
-Data can also be given explicitly as a hash reference of nodes and
-edges.
-
 The C<attribute> is named 'weight' by default, but may be anything of
 your choosing.  This method can be called multiple times on the same
 graph, for nodes of the same name but different attributes values.
 
-The default vertex weighting function (given by C<vertex_method>) is a
+The default vertex weighting function (i.e. C<vertex_method>) is a
 simple sum of the neighbor weights.  An alternative may be provided,
 which should accept of the current node weight, current weight total
 and the attribute as arguments to update.  For example:
@@ -272,7 +264,7 @@ and the attribute as arguments to update.  For example:
     return $current_weight_total / $current_node_weight;
   }
 
-The default edge weighting function (given by C<edge_method>) simply
+The default edge weighting function (i.e. C<edge_method>) simply
 returns the value in the node's neighbor position.  An alternative may
 be provided, as a subroutine reference, which should accept the
 current edge weight and the attribute to update.  For example:
