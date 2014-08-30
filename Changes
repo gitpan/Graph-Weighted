@@ -1,5 +1,8 @@
 Revision history for Graph-Drawing:
 
+0.5303 2014-08-30
+    - Improved documentation!
+
 0.5301 Aug 8, 2012
     - Improve documentation.
     - Test for terminal values.

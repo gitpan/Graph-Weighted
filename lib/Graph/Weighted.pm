@@ -2,9 +2,10 @@ package Graph::Weighted;
 BEGIN {
   $Graph::Weighted::AUTHORITY = 'cpan:GENE';
 }
+
 # ABSTRACT: A weighted graph implementation
 
-our $VERSION = '0.5301';
+our $VERSION = '0.5303';
 
 use warnings;
 use strict;
@@ -45,7 +46,7 @@ sub populate {
     }
     elsif ($data_ref eq 'HASH') {
         for my $vertex (keys %$data) {
-            warn "Neighbors of $vertex: [", join(' ', values %{$data->{$vertex}}), "]\n" if DEBUG;
+            warn "Neighbors of $vertex: [", join(' ', values %{$data->{$vertex}}), "]\n" if DEBUG && ref $vertex;
             $self->_add_weighted_edges_from_hash(
                 $vertex, $data->{$vertex}, $attr, $vertex_method, $edge_method
             );
@@ -165,8 +166,11 @@ sub get_attr {
 
 1;
 
+__END__
 
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -174,23 +178,25 @@ Graph::Weighted - A weighted graph implementation
 
 =head1 VERSION
 
-version 0.5301
+version 0.5303
 
 =head1 SYNOPSIS
 
   use Graph::Weighted;
 
-  $g->populate(
-    [ [ 0, 1, 2, 0, 0 ], # Vertex 0 with 5 edges of weight 3
-      [ 1, 0, 3, 0, 0 ], #    "   1        "               4
-      [ 2, 3, 0, 0, 0 ], #    "   2        "               5
-      [ 0, 0, 1, 0, 0 ], #    "   3        "               1
-      [ 0, 0, 0, 0, 0 ], #    "   4        "               0
-    ]
-  );
+  $g->populate([
+    [ 0, 1, 2, 0, 0 ], # V 0
+    [ 1, 0, 3, 0, 0 ], # V 1
+    [ 2, 3, 0, 0, 0 ], # V 2
+    [ 0, 0, 1, 0, 0 ], # One lonely edge weighing one lonely unit.
+    [ 0, 0, 0, 0, 0 ], # V 4 weighs nothing.
+  ]);
+
   my $attr = 'magnitude';
-  $g->populate(
-    { 0 => { 1 => 4, 3 => 6 },
+
+  # Vertex 0 has 2 edges (1,3) of magnitude (4,6).
+  $g->populate({
+      0 => { 1 => 4, 3 => 6 },
       1 => { 0 => 3, 2 => 7 },
       2 => 8, # Terminal value
       3 => 9, # Terminal value
@@ -198,79 +204,90 @@ version 0.5301
     $attr
   );
 
-  # Show each vertex and its edges.
+  # Show each (numeric) vertex.
   for my $v (sort { $a <=> $b } $g->vertices) {
-    warn sprintf "vertex: %s weight=%.2f, %s=%.2f\n",
-        $v, $g->get_weight($v),
+    printf "vertex: %s weight=%.2f, %s=%.2f\n",
+        $v,    $g->get_weight($v),
         $attr, $g->get_attr($v, $attr);
+
     next if $g->neighbors($v) == 1;
+
+    # Show each (numeric) edge.
     for my $n (sort { $a <=> $b } $g->neighbors($v)) {
-        warn sprintf "\tedge to: %s weight=%.2f, %s=%.2f\n",
-            $n, $g->get_weight([$v, $n]),
+        printf "\tedge to: %s weight=%.2f, %s=%.2f\n",
+            $n,    $g->get_weight([$v, $n]),
             $attr, $g->get_attr([$v, $n], $attr);
     }
   }
 
 =head1 DESCRIPTION
 
-A C<Graph::Weighted> object is a subclass of the L<Graph> module with weighted
-attributes.  As such, all of the C<Graph> methods may be used as documented.
+A C<Graph::Weighted> object is a subclass of the L<Graph> module with concise
+attribute handling (e.g. weight).  As such, all of the L<Graph> methods may be
+used as documented, but with the addition of custom weighting.
 
-=head1 NAME
-
-Graph::Weighted - A weighted graph implementation
+The built-in weighted node and edges can be defined literally, in a matrix or
+hash, or as callbacks to functions that return matrices or hashes based on the
+provided data.
 
 =head1 METHODS
 
 =head2 new()
 
+  my $g = Graph::Weighted->new;
+
 Return a new C<Graph::Weighted> object.
 
-See L<Graph> for the possible constructor arguments.
+Please see L<Graph> for the myriad possible constructor arguments.
 
 =head2 populate()
 
-  $g->populate(\@vectors)
-  $g->populate(\@vectors, $attribute)
-  $g->populate(\%data_points, $attribute)
+  $g->populate(\@vectors);
+  $g->populate(\@vectors, $attribute);
+  $g->populate(\%data_points, $attribute);
+  $g->populate($data, $attribute, \&vertex_method, \&edge_method);
 
 Populate a graph with weighted nodes.
 
-For arguments, C<data> can be a numeric value (a "terminal"), an arrayref of
-numeric vectors or a hashref of numeric edge values.  The C<attribute> is an
-optional string name, with default "weight."  The C<vertex_method> and
+For arguments, the data can be a numeric value ("terminal node"), an arrayref
+of numeric vectors or a hashref of numeric edge values.  The C<attribute> is
+an optional string name, of default "weight."  The C<vertex_method> and
 C<edge_method> are optional code-references giving alternate weighting
 functions.
 
-Examples of C<data> in array reference form:
+Examples of C<data> in array reference form, using the default C<vertex> and
+C<edge> methods:
 
-  []      No edges
-  [0]     1 vertex and 1 edge to node 0 (weight 0)
-  [1]     1 vertex and 1 edge to node 0 (vertex & edge weight 1)
-  [0,1]   2 vertices and 2 edges (edge weights 0,1; vertex weight 1)
-  [0,1,9] 3 vertices and 3 edges (edge weights 0,1,9; vertex weight 10)
+  []      No edges.
+  [0]     1 vertex and 1 edge to node 0 having weight of 0.
+  [1]     1 vertex and 1 edge to node 0 weight 1.
+  [0,1]   2 vertices and 2 edges having edge weights 0,1 and vertex weight 1.
+  [0,1,9] 3 vertices and 3 edges having edge weights 0,1,9 and vertex weight 10.
 
-The C<attribute> is named 'weight' by default, but may be anything of
-your choosing.  This method can be called multiple times on the same
-graph, for nodes of the same name but different attributes values.
+An edge weight of zero can mean anything you wish.  If weights are seen as
+conversation among associates, "In the same room" might be a good analogy, a
+value of zero would mean "no conversation."
 
-The default vertex weighting function (i.e. C<vertex_method>) is a
-simple sum of the neighbor weights.  An alternative may be provided,
-which should accept of the current node weight, current weight total
-and the attribute as arguments to update.  For example:
+The C<attribute> is named 'weight' by default, but can be anything you like.
+Multiple attributes may be applied to a graph, thereby layering increasing the
+overall dimension.
+
+The default vertex weighting function (C<vertex_method>) is a simple sum of
+the neighbor weights.  An alternative may be provided and should accept the
+current node weight, current weight total and the attribute as arguments to
+update.  For example, a percentage wight might be defined as:
 
   sub vertex_weight_function {
-    my ($current_node_weight, $current_weight_total, attribute);
-    return $current_weight_total / $current_node_weight;
+    my ($current_node_weight, $current_weight_total, $attribute);
+    return $current_node_weight / $current_weight_total;
   }
 
-The default edge weighting function (i.e. C<edge_method>) simply
-returns the value in the node's neighbor position.  An alternative may
-be provided, as a subroutine reference, which should accept the
-current edge weight and the attribute to update.  For example:
+The default edge weighting function (C<edge_method>) simply returns the value in
+the node's neighbor position.  Likewise, an alternative may be provided, as a
+callback, as with the C<vertex_weight_function>.  For example:
 
   sub edge_weight_function {
-    my ($weight, attribute);
+    my ($weight, $attribute);
     return $current_weight_total / $current_node_weight;
   }
 
@@ -281,8 +298,8 @@ current edge weight and the attribute to update.  For example:
 
 Return the weight for the vertex or edge.
 
-A vertex is a numeric value.  An edge is an array reference with 2
-elements.  If no value is found, zero is returned.
+A vertex is a numeric value.  An edge is an array reference with 2 elements.
+If no value is found, zero is returned.
 
 =head2 get_attr()
 
@@ -293,30 +310,19 @@ Return the named attribute value for the vertex or edge or zero.
 
 =head1 TO DO
 
-Accept hashrefs and C<Matrix::*> objects instead of just LoLs.  
-Also, possibly L<Statistics::Descriptive::Weighted>.
+Accept C<Matrix::*> objects.  
 
-Find the heaviest and lightest nodes.
+L<Statistics::Descriptive::Weighted> must be investigated...
 
-Find the total weight beneath a node.
+Find the heaviest and lightest nodes and edges.
+
+Find the total weight beneath (and above?) a node.
 
 =head1 SEE ALSO
 
 L<Graph>
 
-The F<eg/> and F<t/*> sources.
-
-=head1 AUTHOR
-
-Gene Boggs, E<lt>gene@cpan.orgE<gt>
-
-=head1 LICENSE AND COPYRIGHT
-
-Copyright 2003-2012 Gene Boggs
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of either: the GNU General Public License as published
-by the Free Software Foundation; or the Artistic License.
+The F<eg/*> and F<t/*> file sources.
 
 =head1 AUTHOR
 
@@ -324,13 +330,9 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Gene Boggs.
+This software is copyright (c) 2013 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-
-__END__
-
